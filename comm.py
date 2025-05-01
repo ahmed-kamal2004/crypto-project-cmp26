@@ -25,7 +25,6 @@ class CommunicationModule:
 
         receiver.capture_seed(message)
 
-        print(sender.seed,receiver.seed)
         if sender.seed_is_captured() and receiver.seed_is_captured():
             return
         raise Exception("Error in sending seeds")

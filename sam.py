@@ -25,6 +25,7 @@ class SeedAuthenticationModule:
         h = hmac.new(key_bytes ,message,hashlib.sha256)
         digest_calculated_hex = h.hexdigest()
         digest_calculated = bytes.fromhex(digest_calculated_hex)
+        
         if digest_received == digest_calculated:
             return message , True
         return message, False

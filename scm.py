@@ -1,5 +1,5 @@
 
-from LCG import LCG
+from lcg import LCG
 from xor import XOR
 
 

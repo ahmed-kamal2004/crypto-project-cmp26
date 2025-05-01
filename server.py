@@ -30,16 +30,17 @@ class Server:
 
     def generate_seed(self):
         self.seed = secrets.token_bytes(self.seed_bytes)
-        enc_seed = SeedEncryptionModule.seed_encrypt(self.seed,self.key)
         digest = SeedAuthenticationModule.create_digest(self.seed,self.key)
-        message = enc_seed + digest
-        return message
+        message = self.seed + digest
+        enc_message = SeedEncryptionModule.msg_encrypt(message,self.key)
+        return enc_message
 
-    def capture_seed(self,message):
-        enc_seed, state = SeedAuthenticationModule.check_digest(message,self.key)
+    def capture_seed(self,enc_message):
+        message = SeedEncryptionModule.msg_decrypt(enc_message,self.key)
+        seed, state = SeedAuthenticationModule.check_digest(message,self.key)
         if not state:
             raise Exception("Not Authenticated")
-        self.seed = SeedEncryptionModule.seed_decrypt(enc_seed,self.key)
+        self.seed = seed
 
 
     def key_is_captured(self):
