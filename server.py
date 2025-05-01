@@ -2,6 +2,7 @@ import secrets
 from sem import SeedEncryptionModule
 from sam import SeedAuthenticationModule
 from config import Config
+from lcg import LinearCongruentialGenerator
 
 class Server:
 
@@ -15,6 +16,9 @@ class Server:
         self.key = None
         self.x = None
         self.seed = None
+        self.message = None
+
+        self.lcg = None
 
 
         pass
@@ -49,10 +53,34 @@ class Server:
     def seed_is_captured(self):
         return self.seed != None
 
-    def encrypt():
-        pass
+    def encrypt(self,msg_stream):
+        k = self.lcg.next()
+        cipher_stream = (k ^ int.from_bytes(msg_stream, 'big'))
+        cipher_byte_stream = cipher_stream.to_bytes((cipher_stream.bit_length() + 7) // 8,'big')
+        return cipher_byte_stream
 
-    def decrypt():
-        pass
+    def decrypt(self,enc_msg):
+        k = self.lcg.next()
+        cipher_stream = (k ^ int.from_bytes(enc_msg, 'big'))
+        cipher_byte_stream = cipher_stream.to_bytes((cipher_stream.bit_length() + 7) // 8,'big')
+        if not self.message:
+            self.message = cipher_byte_stream
+        else:
+            self.message += cipher_byte_stream
 
+    def create_lcg(self):
+        if self.seed_is_captured():
+            self.lcg = LinearCongruentialGenerator(self.seed)
+        else:
+            raise Exception("Capture Seed First")
+        
+    def get_message(self):
+        return self.message
 
+    def finish_sending(self):
+        self.message = None
+
+    def write_msg_to_file(self):
+        with open(Config.out_file, 'w') as out_file:
+            out_file.write(self.message.decode())
+            out_file.close()

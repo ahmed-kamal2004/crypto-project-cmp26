@@ -3,6 +3,7 @@
 from server import Server
 from sam import SeedAuthenticationModule
 from sem import SeedEncryptionModule
+from config import Config
 
 class CommunicationModule:
 
@@ -28,3 +29,27 @@ class CommunicationModule:
         if sender.seed_is_captured() and receiver.seed_is_captured():
             return
         raise Exception("Error in sending seeds")
+    
+
+    @staticmethod
+    def send_message(msg,sender:Server,receiver:Server):
+        
+        ## Initialize the LCG in every Server
+        sender.create_lcg()
+        receiver.create_lcg()
+
+
+        block_size = Config.size
+        indata_bytes = bytearray(msg.encode())
+        for i in range(0, len(indata_bytes), block_size):
+            block = indata_bytes[i:i+block_size]
+            enc_msg = sender.encrypt(block)
+            receiver.decrypt(enc_msg)
+
+        receiver.write_msg_to_file()
+
+
+        print(msg,"\n",receiver.get_message().decode())
+        
+
+

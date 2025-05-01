@@ -14,13 +14,12 @@ if __name__ == "__main__":
         indata = input_file.read()
         input_file.close()
 
+    
+    ## (Mandatory)
     Config.load()
 
     sender = Server()
     receiver = Server()
-
-    
-
 
     ## Apply Diffe-Helman Algorithm
 
@@ -29,6 +28,9 @@ if __name__ == "__main__":
     ## Exchange Seeds (Needs Encryption)
 
     CommunicationModule.send_seeds(sender,receiver)
+
+    ## Start Message Sharing
+    CommunicationModule.send_message(indata,sender,receiver)
 
     
 
